@@ -1,70 +1,135 @@
 'use client';
 
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { Card, CardContent, Typography, Grid, TextField, Stack, InputAdornment, Checkbox, Divider, IconButton, List, ListItem, ListItemText, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { format, formatDistanceToNow } from 'date-fns';
+import { Database } from '@/utils/types/database.types';
+import { useAuth } from '@clerk/nextjs';
+import supabaseClient from '@/utils/supabaseClient';
 
-type TodoItem = {
-    text: string,
-    completed: boolean,
-    id: number,
-};
+export type TodosType = Database['public']['Tables']['todos']['Row'];
+
+const currentTime = new Date().getTime();
 
 const Todos = () => {
-    const [todos, setTodos] = useState<TodoItem[]>([]);
+    const [todos, setTodos] = useState<TodosType[]>([]);
     const [input, setInput] = useState<string>('');
     const [isEdited, setIsEdited] = useState(false);
     const [editedId, setEditedId] = useState<number>(0);
+
+    const { getToken, userId } = useAuth();
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setInput(event.target.value);
     };
 
-    const handleButtonClick = () => {
-        if (!isEdited) {
-            setTodos([...todos, { text: input, completed: false, id: new Date().getTime() }]);
-            setInput('');
-            setIsEdited(false);
-        } else {
-            setTodos([...todos, { text: input, completed: false, id: editedId }]);
+    const getTodos = async () => {
+        const accessToken = await getToken({ template: 'supabase' });
+        const supabase = await supabaseClient(accessToken as string);
+
+        if (!userId) return;
+
+        const { data, error } = await supabase
+            .from('todos')
+            .select('*')
+            .order('id', { ascending: false })
+            .eq('clerk_user_id', userId);
+
+        if (error) {
+            console.log(error.message);
         }
 
+        setTodos(data as TodosType[]);
+    };
+
+    useEffect(() => {
+        getTodos();
+    }, []);
+
+    const handleButtonClick = async () => {
+        const accessToken = await getToken({ template: 'supabase' });
+        const supabase = await supabaseClient(accessToken as string);
+        if (!userId) return;
+
+        if (!isEdited) {
+            const { error } = await supabase
+                .from('todos')
+                .insert([
+                    {
+                        text: input,
+                        completed: false,
+                        clerk_user_id: userId,
+                        created_at: currentTime,
+                        updated_at: currentTime,
+                    },
+                ]);
+
+            if (error) {
+                console.log(error.message);
+            }
+        } else {
+            const { error } = await supabase
+                .from('todos')
+                .update({ text: input, updated_at: currentTime })
+                .eq('id', editedId);
+
+            if (error) {
+                console.log(error.message);
+            }
+        }
+
+        getTodos();
         setInput('');
         setIsEdited(false);
     };
 
-    const handleToggleComplete = (id: number) => {
-        const updated = todos.map((todo) => {
-            if (todo.id === id) {
-                return {
-                    ...todo,
-                    completed: !todo.completed,
-                };
-            }
+    const handleToggleComplete = async (id: number) => {
+        const accessToken = await getToken({ template: 'supabase' });
+        const supabase = await supabaseClient(accessToken as string);
 
-            return todo;
-        });
-        setTodos(updated);
+        const todo = todos.find((todo) => todo.id === id);
+
+        const updatedCompleted = !todo?.completed;
+
+        const { error } = await supabase
+            .from('todos')
+            .update({ completed: updatedCompleted, updated_at: currentTime })
+            .eq('id', id);
+
+        if (error) {
+            console.log(error.message);
+        }
+
+        getTodos();
     };
 
-    const handleDelete = (id: number) => {
-        const newTodos = todos.filter((todo) => todo.id !== id);
-        setTodos(newTodos);
+    const handleDelete = async (id: number) => {
+        const accessToken = await getToken({ template: 'supabase' });
+        const supabase = await supabaseClient(accessToken as string);
+
+        const { error } = await supabase
+            .from('todos')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.log(error.message);
+        }
+
+        getTodos();
     };
 
     const handleEdit = (id: number) => {
-        const newTodos = todos.filter((todo) => todo.id !== id);
-        const editValue = todos.find((todo) => todo.id === id);
-        if (editValue) {
-            setInput(editValue.text);
-        }
+        const todoToEdit = todos.find((todo) => todo.id === id);
 
-        setTodos(newTodos);
-        setEditedId(id);
-        setIsEdited(true);
+        if (todoToEdit) {
+            setInput(todoToEdit.text);
+            setEditedId(id);
+            setIsEdited(true);
+        }
     };
 
     return (
@@ -73,7 +138,7 @@ const Todos = () => {
                 <Card sx={{ minWidth: 275, boxShadow: '0 0 5px 1px' }}>
                     <CardContent>
                         <Stack spacing={4}>
-                            <Typography sx={{ fontSize: 15 }} color="text.secondary" gutterBottom>
+                            <Typography variant="h6" color="text.secondary" gutterBottom>
                                 TODO CRUD APP
                             </Typography>
                             <Grid container spacing={2}>
@@ -87,10 +152,15 @@ const Todos = () => {
                                         placeholder="Enter task"
                                         value={input}
                                         onChange={handleInputChange}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleButtonClick();
+                                            }
+                                        }}
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <AddIcon />
+                                                    <AddIcon color="success" />
                                                 </InputAdornment>
                                             ),
                                         }}
@@ -106,11 +176,11 @@ const Todos = () => {
                                         <ListItem
                                             secondaryAction={(
                                                 <>
-                                                    <IconButton edge="end" onClick={() => handleEdit(todo.id)}>
-                                                        <EditIcon />
+                                                    <IconButton edge="end" onClick={() => { handleEdit(todo.id); }}>
+                                                        <EditIcon color="secondary" />
                                                     </IconButton>
-                                                    <IconButton edge="end" onClick={() => handleDelete(todo.id)}>
-                                                        <DeleteIcon />
+                                                    <IconButton edge="end" onClick={() => { handleDelete(todo.id); }}>
+                                                        <DeleteIcon color="error" />
                                                     </IconButton>
                                                 </>
                                             )}
@@ -120,11 +190,11 @@ const Todos = () => {
                                                 checked={todo.completed}
                                                 tabIndex={-1}
                                                 disableRipple
-                                                onChange={() => handleToggleComplete(todo.id)}
+                                                onChange={() => { handleToggleComplete(todo.id); }}
                                             />
                                             <ListItemText
                                                 primary={todo.text}
-                                                secondary={`Updated ${formatDistanceToNow(new Date(todo.id))} ago, ${format(new Date(todo.id), 'HH.mm')}`}
+                                                secondary={`Updated ${formatDistanceToNow(new Date(todo.updated_at as number))} ago, ${format(new Date(todo.updated_at as number), 'HH.mm')}`}
                                                 sx={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
                                             />
                                         </ListItem>
