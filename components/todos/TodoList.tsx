@@ -1,4 +1,4 @@
-import { Checkbox, Divider, IconButton, List, ListItem, ListItemText } from '@mui/material';
+import { AlertColor, Checkbox, Divider, IconButton, List, ListItem, ListItemText } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -20,11 +20,12 @@ type TodoListProps = {
     setEditedId: React.Dispatch<React.SetStateAction<number>>;
     setIsEdited: React.Dispatch<React.SetStateAction<boolean>>;
     getTodos: () => Promise<void>;
+    setMessageObject: React.Dispatch<React.SetStateAction<{ message: string, type: AlertColor | undefined } | undefined>>;
 };
 
 const TodoList = (props: TodoListProps) => {
     const {
-        todos, setInput, setEditedId, setIsEdited, getTodos = () => {},
+        todos, setInput, setEditedId, setIsEdited, getTodos = () => {}, setMessageObject,
     } = props;
 
     const handleToggleComplete = async (id: number) => {
@@ -38,7 +39,7 @@ const TodoList = (props: TodoListProps) => {
             body: JSON.stringify({ updatedData: { completed: updatedCompleted, updated_at: currentTime } }),
         });
 
-        if (updatedTodoResponse.ok) console.log('Updated todo.');
+        if (updatedTodoResponse.ok) setMessageObject({ message: 'Todo has been successfully updated.', type: 'success' });
 
         getTodos();
     };
@@ -50,7 +51,7 @@ const TodoList = (props: TodoListProps) => {
             body: JSON.stringify({ id }),
         });
 
-        if (deletedTodoResponse.ok) console.log('Deleted todo.');
+        if (deletedTodoResponse.ok) setMessageObject({ message: 'Todo has been successfully deleted.', type: 'error' });
 
         getTodos();
     };

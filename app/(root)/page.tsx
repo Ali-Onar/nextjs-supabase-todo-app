@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Card, CardContent, Typography, Grid, TextField, Stack, InputAdornment, Button } from '@mui/material';
+import { Card, CardContent, Typography, Grid, TextField, Stack, InputAdornment, Button, Alert, AlertColor } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 import { Database } from '@/utils/types/database.types';
@@ -22,6 +22,7 @@ const Todos = () => {
     const [input, setInput] = useState<string>('');
     const [isEdited, setIsEdited] = useState(false);
     const [editedId, setEditedId] = useState<number>(0);
+    const [messageObject, setMessageObject] = useState<{ message: string, type: AlertColor | undefined }>();
 
     const { userId } = useAuth();
 
@@ -43,6 +44,16 @@ const Todos = () => {
         getTodos();
     }, []);
 
+    useEffect(() => {
+        if (messageObject) {
+            const timer = setTimeout(() => {
+                setMessageObject(undefined); // Clear the message after 5 seconds
+            }, 5000);
+
+            return () => clearTimeout(timer); // Clear the timer on unmount
+        }
+    }, [messageObject]);
+
     const handleButtonClick = async () => {
         if (!isEdited) {
             const createdTodoResponse = await fetch('/api/todos', {
@@ -54,14 +65,14 @@ const Todos = () => {
                     },
                 }),
             });
-            if (createdTodoResponse.ok) console.log('Created todo.');
+            if (createdTodoResponse.ok) setMessageObject({ message: 'Todo has been successfully created.', type: 'success' });
         } else {
             const updatedTodoResponse = await fetch(`/api/todos?id=${editedId}`, {
                 method: 'PUT',
                 headers: apiHeaders,
                 body: JSON.stringify({ updatedData: { text: input, updated_at: currentTime } }),
             });
-            if (updatedTodoResponse.ok) console.log('Updated todo.');
+            if (updatedTodoResponse.ok) setMessageObject({ message: 'Todo has been successfully updated.', type: 'success' });
         }
 
         getTodos();
@@ -106,6 +117,7 @@ const Todos = () => {
                                         {isEdited ? 'Edit Todo' : 'Add Todo'}
                                     </Button>
                                 </Grid>
+
                             </Grid>
 
                             <TodoList
@@ -114,7 +126,12 @@ const Todos = () => {
                                 setEditedId={setEditedId}
                                 setIsEdited={setIsEdited}
                                 getTodos={getTodos}
+                                setMessageObject={setMessageObject}
                             />
+
+                            {messageObject && (
+                                <Alert severity={messageObject.type}>{messageObject.message}</Alert>
+                            )}
 
                         </Stack>
                     </CardContent>
