@@ -1,18 +1,21 @@
 'use client';
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Card, CardContent, Typography, Grid, TextField, Stack, InputAdornment, Checkbox, Divider, IconButton, List, ListItem, ListItemText, Button } from '@mui/material';
+import { Card, CardContent, Typography, Grid, TextField, Stack, InputAdornment, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { format, formatDistanceToNow } from 'date-fns';
+
 import { Database } from '@/utils/types/database.types';
 import { useAuth } from '@clerk/nextjs';
-import supabaseClient from '@/utils/supabaseClient';
+import TodoList from '@/components/todos/TodoList';
 
 export type TodosType = Database['public']['Tables']['todos']['Row'];
 
 const currentTime = new Date().getTime();
+
+const apiHeaders = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+};
 
 const Todos = () => {
     const [todos, setTodos] = useState<TodosType[]>([]);
@@ -20,29 +23,20 @@ const Todos = () => {
     const [isEdited, setIsEdited] = useState(false);
     const [editedId, setEditedId] = useState<number>(0);
 
-    const { getToken, userId } = useAuth();
+    const { userId } = useAuth();
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setInput(event.target.value);
     };
 
     const getTodos = async () => {
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await supabaseClient(accessToken as string);
+        const fetchingTodos = await fetch('/api/todos', {
+            method: 'GET',
+            headers: apiHeaders,
+        });
 
-        if (!userId) return;
-
-        const { data, error } = await supabase
-            .from('todos')
-            .select('*')
-            .order('id', { ascending: false })
-            .eq('clerk_user_id', userId);
-
-        if (error) {
-            console.log(error.message);
-        }
-
-        setTodos(data as TodosType[]);
+        const apiData = await fetchingTodos.json();
+        setTodos(apiData as TodosType[]);
     };
 
     useEffect(() => {
@@ -50,86 +44,29 @@ const Todos = () => {
     }, []);
 
     const handleButtonClick = async () => {
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await supabaseClient(accessToken as string);
-        if (!userId) return;
-
         if (!isEdited) {
-            const { error } = await supabase
-                .from('todos')
-                .insert([
-                    {
-                        text: input,
-                        completed: false,
-                        clerk_user_id: userId,
-                        created_at: currentTime,
-                        updated_at: currentTime,
+            const createdTodoResponse = await fetch('/api/todos', {
+                method: 'POST',
+                headers: apiHeaders,
+                body: JSON.stringify({
+                    insertData: {
+                        text: input, completed: false, created_at: currentTime, updated_at: currentTime, clerk_user_id: userId,
                     },
-                ]);
-
-            if (error) {
-                console.log(error.message);
-            }
+                }),
+            });
+            if (createdTodoResponse.ok) console.log('Created todo.');
         } else {
-            const { error } = await supabase
-                .from('todos')
-                .update({ text: input, updated_at: currentTime })
-                .eq('id', editedId);
-
-            if (error) {
-                console.log(error.message);
-            }
+            const updatedTodoResponse = await fetch(`/api/todos?id=${editedId}`, {
+                method: 'PUT',
+                headers: apiHeaders,
+                body: JSON.stringify({ updatedData: { text: input, updated_at: currentTime } }),
+            });
+            if (updatedTodoResponse.ok) console.log('Updated todo.');
         }
 
         getTodos();
         setInput('');
         setIsEdited(false);
-    };
-
-    const handleToggleComplete = async (id: number) => {
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await supabaseClient(accessToken as string);
-
-        const todo = todos.find((todo) => todo.id === id);
-
-        const updatedCompleted = !todo?.completed;
-
-        const { error } = await supabase
-            .from('todos')
-            .update({ completed: updatedCompleted, updated_at: currentTime })
-            .eq('id', id);
-
-        if (error) {
-            console.log(error.message);
-        }
-
-        getTodos();
-    };
-
-    const handleDelete = async (id: number) => {
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await supabaseClient(accessToken as string);
-
-        const { error } = await supabase
-            .from('todos')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            console.log(error.message);
-        }
-
-        getTodos();
-    };
-
-    const handleEdit = (id: number) => {
-        const todoToEdit = todos.find((todo) => todo.id === id);
-
-        if (todoToEdit) {
-            setInput(todoToEdit.text);
-            setEditedId(id);
-            setIsEdited(true);
-        }
     };
 
     return (
@@ -165,43 +102,19 @@ const Todos = () => {
                                             ),
                                         }}
                                     />
-                                    <Button variant="contained" onClick={handleButtonClick} disabled={!input}>
+                                    <Button variant="contained" onClick={() => { handleButtonClick(); }} disabled={!input}>
                                         {isEdited ? 'Edit Todo' : 'Add Todo'}
                                     </Button>
                                 </Grid>
                             </Grid>
-                            <List>
-                                {todos.map((todo) => (
-                                    <div key={todo.id}>
-                                        <ListItem
-                                            secondaryAction={(
-                                                <>
-                                                    <IconButton edge="end" onClick={() => { handleEdit(todo.id); }}>
-                                                        <EditIcon color="secondary" />
-                                                    </IconButton>
-                                                    <IconButton edge="end" onClick={() => { handleDelete(todo.id); }}>
-                                                        <DeleteIcon color="error" />
-                                                    </IconButton>
-                                                </>
-                                            )}
-                                        >
-                                            <Checkbox
-                                                edge="start"
-                                                checked={todo.completed}
-                                                tabIndex={-1}
-                                                disableRipple
-                                                onChange={() => { handleToggleComplete(todo.id); }}
-                                            />
-                                            <ListItemText
-                                                primary={todo.text}
-                                                secondary={`Updated ${formatDistanceToNow(new Date(todo.updated_at as number))} ago, ${format(new Date(todo.updated_at as number), 'HH.mm')}`}
-                                                sx={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
-                                            />
-                                        </ListItem>
-                                        <Divider />
-                                    </div>
-                                ))}
-                            </List>
+
+                            <TodoList
+                                todos={todos}
+                                setInput={setInput}
+                                setEditedId={setEditedId}
+                                setIsEdited={setIsEdited}
+                                getTodos={getTodos}
+                            />
 
                         </Stack>
                     </CardContent>
