@@ -1,26 +1,59 @@
 # nexjts-supabase-todo-app
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This project is a comprehensive demonstration of integrating Next.js with Supabase, Clerk, and Material UI to create a robust TODO application. It showcases CRUD operations, authentication, and a modern UI design.
+
+![Todo App View](<CleanShot 2023-12-23 at 18.45.52@2x.png>)
+
+
+## Overview
+
+In this tutorial we will build a CRUD application by combining three major technologies. We will use Clerk for Auth, Supabase for database and Nextjs as a framework.
+You will also learn in this guide:
+ - How to create Route Handler with Nextjs 14 App Router?
+ - How to set up Auth system with Clerk?
+ - How to establish Supabase connection with JWT token?
+
+For a detailed guide to this project: ['Todo App Guide with Nextjs 14, Clerk and Supabase'](https://alitunacanonar.medium.com/todo-app-guide-with-nextjs-14-clerk-and-supabase-95f5f17225d3)
+
+## Features
+
+- **CRUD Operations**: Create, read, update, and delete your TODOs.
+- **Authentication**: Secure user authentication using Clerk.
+- **Database**: Supabase integration for backend storage.
+- **UI**: Sleek user interface with Material UI.
 
 ## Getting Started
 
-First, run the development server:
+- Node.js
+- npm or yarn
+- Clerk and Supabase installations must be done, there must be api keys in the .env.local file.
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Ali-Onar/nextjs-supabase-todo-app.git
+ ```
+
+Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+Run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application should look like the following at the end:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+![Final project](<CleanShot 2023-12-23 at 18.00.01-1.gif>)
 
 ## Learn More
 
