@@ -5,8 +5,6 @@ import { format, formatDistanceToNow } from 'date-fns';
 import { Database } from '@/utils/types/database.types';
 import React from 'react';
 
-const currentTime = new Date().getTime();
-
 const apiHeaders = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -29,6 +27,7 @@ const TodoList = (props: TodoListProps) => {
     } = props;
 
     const handleToggleComplete = async (id: number) => {
+        const currentTime = new Date().getTime();
         const selectedTodo = todos.find((todo) => todo.id === id);
 
         const updatedCompleted = !selectedTodo?.completed;
@@ -48,7 +47,6 @@ const TodoList = (props: TodoListProps) => {
         const deletedTodoResponse = await fetch(`/api/todos?id=${id}`, {
             method: 'DELETE',
             headers: apiHeaders,
-            body: JSON.stringify({ id }),
         });
 
         if (deletedTodoResponse.ok) setMessageObject({ message: 'Todo has been successfully deleted.', type: 'error' });

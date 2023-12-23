@@ -10,8 +10,6 @@ import TodoList from '@/components/todos/TodoList';
 
 export type TodosType = Database['public']['Tables']['todos']['Row'];
 
-const currentTime = new Date().getTime();
-
 const apiHeaders = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -55,6 +53,8 @@ const Todos = () => {
     }, [messageObject]);
 
     const handleButtonClick = async () => {
+        const currentTime = new Date().getTime();
+
         if (!isEdited) {
             const createdTodoResponse = await fetch('/api/todos', {
                 method: 'POST',

@@ -14,7 +14,7 @@ export async function GET() {
             .from('todos')
             .select('*')
             .order('id', { ascending: false })
-            .eq('clerk_user_id', userId!);
+            .eq('clerk_user_id', userId);
 
         handleErrorResponse(error);
 
@@ -56,7 +56,7 @@ export async function PUT(request: Request) {
         const { data, error } = await supabase
             .from('todos')
             .update(updatedData)
-            .eq('id', id!)
+            .eq('id', id)
             .select();
 
         handleErrorResponse(error);
@@ -77,7 +77,7 @@ export async function DELETE(request: Request) {
         const { data, error } = await supabase
             .from('todos')
             .delete()
-            .eq('id', id!)
+            .eq('id', id)
             .select();
 
         handleErrorResponse(error);
