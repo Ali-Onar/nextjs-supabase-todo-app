@@ -74,7 +74,7 @@ const TodoList = (props: TodoListProps) => {
                         secondaryAction={(
                             <>
                                 <IconButton edge="end" onClick={() => { handleEdit(todo.id); }}>
-                                    <EditIcon color="secondary" />
+                                    <EditIcon color="success" />
                                 </IconButton>
                                 <IconButton edge="end" onClick={() => { handleDelete(todo.id); }}>
                                     <DeleteIcon color="error" />

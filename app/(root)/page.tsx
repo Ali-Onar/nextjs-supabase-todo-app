@@ -86,7 +86,7 @@ const Todos = () => {
                 <Card sx={{ minWidth: 275, boxShadow: '0 0 5px 1px' }}>
                     <CardContent>
                         <Stack spacing={4}>
-                            <Typography variant="h6" color="text.secondary" gutterBottom>
+                            <Typography variant="h6" color="text.secondary" gutterBottom sx={{ display: 'flex', justifyContent: 'center' }}>
                                 TODO CRUD APP
                             </Typography>
                             <Grid container spacing={2}>
