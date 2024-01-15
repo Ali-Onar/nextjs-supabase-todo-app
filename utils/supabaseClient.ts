@@ -14,8 +14,8 @@ async function getSupabaseClient() {
     const accessToken = await getToken({ template: 'supabase' });
 
     return createClient<Database>(
-        supabaseUrl as string,
-        supabaseAnonKey as string,
+        supabaseUrl,
+        supabaseAnonKey,
         { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
     );
 }

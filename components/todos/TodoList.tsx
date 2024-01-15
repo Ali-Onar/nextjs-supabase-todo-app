@@ -66,7 +66,7 @@ const TodoList = (props: TodoListProps) => {
 
     return (
         <List>
-            {todos.map((todo) => (
+            {todos?.map((todo) => (
                 <div key={todo.id}>
                     <ListItem
                         secondaryAction={(
