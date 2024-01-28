@@ -2,13 +2,13 @@
 
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs';
-import getSupabaseClient from '@/utils/supabaseClient';
-import { handleErrorResponse, handleJSErrorResponse } from '@/utils/supabaseErrorHandlers';
+import getSupabaseServer from '@/utils/supabase/supabaseServer';
+import { handleErrorResponse, handleJSErrorResponse } from '@/utils/supabase/supabaseErrorHandlers';
 
 export async function GET() {
     try {
         const { userId } = auth();
-        const supabase = await getSupabaseClient();
+        const supabase = await getSupabaseServer();
 
         const { data, error } = await supabase
             .from('todos')
@@ -26,7 +26,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const supabase = await getSupabaseClient();
+        const supabase = await getSupabaseServer();
 
         const body = await request.json();
         const { insertData } = body;
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
     try {
-        const supabase = await getSupabaseClient();
+        const supabase = await getSupabaseServer();
 
         const body = await request.json();
         const { updatedData } = body;
@@ -69,7 +69,7 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
-        const supabase = await getSupabaseClient();
+        const supabase = await getSupabaseServer();
 
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');

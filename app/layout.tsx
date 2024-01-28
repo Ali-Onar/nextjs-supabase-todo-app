@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -22,7 +23,17 @@ export default function RootLayout({ children }: {
                 <head>
                     <link rel="icon" href="/favicon.ico" sizes="any" />
                 </head>
-                <body className={poppins.className}>{children}</body>
+                <body className={poppins.className}>
+                    <Toaster
+                        position="bottom-right"
+                        reverseOrder={false}
+                        toastOptions={{
+                            duration: 5000,
+                            style: { background: '#333', color: '#fff' },
+                        }}
+                    />
+                    {children}
+                </body>
             </html>
         </ClerkProvider>
     );

@@ -12,10 +12,11 @@ export interface Database {
             todos: {
                 Row: {
                     clerk_user_id: string
-                    completed: boolean
+                    completed: boolean | null
                     created_at: number | null
                     id: number
                     text: string
+                    todo_level: number | null
                     updated_at: number | null
                 }
                 Insert: {
@@ -24,6 +25,7 @@ export interface Database {
                     created_at?: number | null
                     id?: number
                     text: string
+                    todo_level?: number | null
                     updated_at?: number | null
                 }
                 Update: {
@@ -32,6 +34,7 @@ export interface Database {
                     created_at?: number | null
                     id?: number
                     text?: string
+                    todo_level?: number | null
                     updated_at?: number | null
                 }
                 Relationships: []

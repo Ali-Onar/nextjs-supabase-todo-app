@@ -2,12 +2,12 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { auth } from '@clerk/nextjs';
-import { Database } from './types/database.types';
+import { Database } from '../types/database.types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-async function getSupabaseClient() {
+async function getSupabaseServer() {
     const { userId, getToken } = auth();
     if (!userId) throw new Error('User not authenticated');
 
@@ -20,4 +20,4 @@ async function getSupabaseClient() {
     );
 }
 
-export default getSupabaseClient;
+export default getSupabaseServer;

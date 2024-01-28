@@ -1,16 +1,15 @@
-import { AlertColor, Checkbox, Divider, IconButton, List, ListItem, ListItemText } from '@mui/material';
+import { Checkbox, Divider, IconButton, List, ListItem, ListItemText } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Database } from '@/utils/types/database.types';
 import React from 'react';
+import { TodosType } from '@/utils/types/helper.types';
+import toast from 'react-hot-toast';
 
 const apiHeaders = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
 };
-
-export type TodosType = Database['public']['Tables']['todos']['Row'];
 
 type TodoListProps = {
     todos: TodosType[];
@@ -18,12 +17,11 @@ type TodoListProps = {
     setEditedId: React.Dispatch<React.SetStateAction<number>>;
     setIsEdited: React.Dispatch<React.SetStateAction<boolean>>;
     getTodos: () => Promise<void>;
-    setMessageObject: React.Dispatch<React.SetStateAction<{ message: string, type: AlertColor | undefined } | undefined>>;
 };
 
 const TodoList = (props: TodoListProps) => {
     const {
-        todos, setInput, setEditedId, setIsEdited, getTodos = () => {}, setMessageObject,
+        todos, setInput, setEditedId, setIsEdited, getTodos = () => {},
     } = props;
 
     const handleToggleComplete = async (id: number) => {
@@ -38,7 +36,7 @@ const TodoList = (props: TodoListProps) => {
             body: JSON.stringify({ updatedData: { completed: updatedCompleted, updated_at: currentTime } }),
         });
 
-        if (updatedTodoResponse.ok) setMessageObject({ message: 'Todo has been successfully updated.', type: 'success' });
+        if (updatedTodoResponse.ok) toast.success('Todo updated successfully.');
 
         getTodos();
     };
@@ -49,7 +47,7 @@ const TodoList = (props: TodoListProps) => {
             headers: apiHeaders,
         });
 
-        if (deletedTodoResponse.ok) setMessageObject({ message: 'Todo has been successfully deleted.', type: 'error' });
+        if (deletedTodoResponse.ok) toast.success('Todo deleted successfully.');
 
         getTodos();
     };
@@ -89,7 +87,7 @@ const TodoList = (props: TodoListProps) => {
                         />
                         <ListItemText
                             primary={todo.text}
-                            secondary={`Updated ${formatDistanceToNow(new Date(todo.updated_at as number))} ago, ${format(new Date(todo.updated_at as number), 'HH.mm')}`}
+                            secondary={`Updated ${formatDistanceToNow(new Date(todo.updated_at))} ago, ${format(new Date(todo.updated_at), 'HH.mm')}`}
                             sx={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
                         />
                     </ListItem>
