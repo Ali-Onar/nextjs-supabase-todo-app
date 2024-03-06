@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '@clerk/nextjs';
-import getSupabaseClient from '@/utils/supabase/supabaseClient';
 import toast from 'react-hot-toast';
+import supabase from '@/utils/supabase/supabaseClient';
 
 type NewTodoProps = {
     open: boolean;
@@ -15,12 +15,10 @@ const CreateTodoModal = (props: NewTodoProps) => {
     const { open, handleClose, onActionFinish = () => {} } = props;
     const [input, setInput] = useState<string>('');
 
-    const { userId, getToken } = useAuth();
+    const { userId } = useAuth();
 
     const createTodo = async () => {
         const currentTime = new Date().getTime();
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await getSupabaseClient(accessToken);
 
         const { error } = await supabase
             .from('todos')
@@ -29,7 +27,7 @@ const CreateTodoModal = (props: NewTodoProps) => {
             }]);
 
         if (error) {
-            console.log(error.message);
+            console.log('create todo error', error.message);
         }
 
         setInput('');

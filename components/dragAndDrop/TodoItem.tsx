@@ -9,8 +9,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { TodosType } from '@/utils/types/helper.types';
 import { useAuth } from '@clerk/nextjs';
-import getSupabaseClient from '@/utils/supabase/supabaseClient';
 import toast from 'react-hot-toast';
+import supabase from '@/utils/supabase/supabaseClient';
 import EditTodoModal from './EditTodoModal';
 
 type TodoItemProps = {
@@ -21,7 +21,7 @@ type TodoItemProps = {
 const TodoItem = (props: TodoItemProps) => {
     const { todo, refreshTodos } = props;
     const [editTodoShow, setEditTodoShow] = React.useState<boolean>(false);
-    const { userId, getToken } = useAuth();
+    const { userId } = useAuth();
 
     const {
         attributes,
@@ -33,9 +33,6 @@ const TodoItem = (props: TodoItemProps) => {
 
     const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>, id: number) => {
         event.stopPropagation();
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await getSupabaseClient(accessToken);
-
         const { error } = await supabase
             .from('todos')
             .delete()

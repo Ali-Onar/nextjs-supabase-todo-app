@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Container, Button } from '@mui/material';
 import TodoList from '@/components/dragAndDrop/TodoList';
 import { DndContext, useSensor, PointerSensor, DragEndEvent, useSensors } from '@dnd-kit/core';
-import getSupabaseClient from '@/utils/supabase/supabaseClient';
 import { useAuth } from '@clerk/nextjs';
 import NewTodo from '@/components/dragAndDrop/CreateTodoModal';
 import { SortableContext } from '@dnd-kit/sortable';
 import { TodosType } from '@/utils/types/helper.types';
+import supabase from '@/utils/supabase/supabaseClient';
 
 const cardTitles = [
     { index: 0, title: 'Unassigned' },
@@ -20,7 +20,9 @@ const Todos = () => {
     const [todos, setTodos] = useState<TodosType[]>([]);
     const [open, setOpen] = React.useState(false);
 
-    const { userId, getToken } = useAuth();
+    const container = typeof window !== 'undefined' ? window.Clerk : null;
+
+    const { userId } = useAuth();
 
     const pointerSensor = useSensor(PointerSensor, {
         activationConstraint: {
@@ -32,9 +34,6 @@ const Todos = () => {
     const sensors = useSensors(pointerSensor);
 
     const getTodos = async () => {
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await getSupabaseClient(accessToken);
-
         const { data, error } = await supabase
             .from('todos')
             .select('*')
@@ -51,12 +50,9 @@ const Todos = () => {
 
     useEffect(() => {
         getTodos();
-    }, []);
+    }, [container]);
 
     const handleDragEnd = async (event: DragEndEvent) => {
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await getSupabaseClient(accessToken);
-
         const { active, over } = event;
 
         if (!over || active.id === over.id) {

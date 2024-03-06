@@ -19,8 +19,10 @@ export async function GET() {
         handleErrorResponse(error);
 
         return NextResponse.json(data, { status: 201 });
-    } catch (error: any) {
-        handleJSErrorResponse(error);
+    } catch (error) {
+        const err = error as Error;
+
+        handleJSErrorResponse(err.message);
     }
 }
 
@@ -39,7 +41,9 @@ export async function POST(request: Request) {
 
         return NextResponse.json(data, { status: 201 });
     } catch (error: any) {
-        handleJSErrorResponse(error);
+        const err = error as Error;
+
+        handleJSErrorResponse(err.message);
     }
 }
 
@@ -63,7 +67,9 @@ export async function PUT(request: Request) {
 
         return NextResponse.json(data, { status: 201 });
     } catch (error: any) {
-        handleJSErrorResponse(error);
+        const err = error as Error;
+
+        handleJSErrorResponse(err.message);
     }
 }
 
@@ -84,6 +90,8 @@ export async function DELETE(request: Request) {
 
         return NextResponse.json(data, { status: 201 });
     } catch (error: any) {
-        handleJSErrorResponse(error);
+        const err = error as Error;
+
+        handleJSErrorResponse(err.message);
     }
 }

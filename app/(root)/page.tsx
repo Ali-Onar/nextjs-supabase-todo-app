@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardActions, Button, Typography, List, ListItem, ListItemText, Grid, Container } from '@mui/material';
-import Link from 'next/link';
+import { Typography, List, ListItem, ListItemText, Grid, Container } from '@mui/material';
 
 const technologies = [
     { name: 'Next.js 14 App Router', description: 'Modern front-end routing.' },
@@ -13,44 +12,28 @@ const technologies = [
     { name: '@dnd-kit/core', description: 'Comprehensive tools for drag and drop functionality.' },
 ];
 
+const pagesDescription = [
+    { title: 'Basic Todos', description: 'Client Side Rendered. Route Handler is used for CRUD operations.' },
+    { title: 'D&D Todos', description: 'Client Side Rendered. The createClerkSupabaseClient function is used for CRUD operations.' },
+    { title: 'Server Side Test', description: 'Server Side Rendered. getSupabaseServer function is used.' },
+];
+
 const HomePage = () => (
     <Container maxWidth="xl">
         <Grid container spacing={2} sx={{ mt: 5 }}>
             <Grid item xs={12} md={6}>
-                <Card>
-                    <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
-                            Basic Todos
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Traditional todo list management. Simple and practical.
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        <Link href="/basic-todos" passHref>
-                            <Button size="small">Explore</Button>
-                        </Link>
-                    </CardActions>
-                </Card>
+                <Typography variant="h4" gutterBottom>
+                    About Pages:
+                </Typography>
+                <List>
+                    {pagesDescription.map((tech, index) => (
+                        <ListItem key={index}>
+                            <ListItemText primary={tech.title} secondary={tech.description} />
+                        </ListItem>
+                    ))}
+                </List>
             </Grid>
             <Grid item xs={12} md={6}>
-                <Card>
-                    <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
-                            Drag & Drop Todos
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Manage your todos by dragging and dropping. More interactive and fun.
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        <Link href="/dnd-todos" passHref>
-                            <Button size="small">Explore</Button>
-                        </Link>
-                    </CardActions>
-                </Card>
-            </Grid>
-            <Grid item xs={12}>
                 <Typography variant="h4" gutterBottom>
                     Technologies Used in Our Project
                 </Typography>

@@ -13,17 +13,19 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const pages = [
     { title: 'Home', href: '/' },
     { title: 'Basic Todos', href: '/basic-todos' },
     { title: 'D&D Todos', href: '/dnd-todos' },
+    { title: 'Server Side Test', href: '/server-side-test' },
 ];
 
 function Header() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
+    const pathname = usePathname();
     const router = useRouter();
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -78,7 +80,12 @@ function Header() {
                             <Button
                                 key={page.href}
                                 onClick={() => router.push(page.href)}
-                                sx={{ my: 2, color: '#000', display: 'block' }}
+                                sx={{
+                                    my: 2,
+                                    color: pathname === page.href ? 'primary.main' : 'text.primary',
+                                    borderBottom: pathname === page.href ? 2 : 0,
+                                    borderColor: 'primary.main',
+                                }}
                             >
                                 {page.title}
                             </Button>

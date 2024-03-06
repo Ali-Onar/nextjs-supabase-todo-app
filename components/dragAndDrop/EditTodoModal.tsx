@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '@clerk/nextjs';
-import getSupabaseClient from '@/utils/supabase/supabaseClient';
 import toast from 'react-hot-toast';
+import supabase from '@/utils/supabase/supabaseClient';
 
 type EditTodoProps = {
     open: boolean;
@@ -19,12 +19,9 @@ const EditTodoModal = (props: EditTodoProps) => {
 
     const [input, setInput] = useState<string>('');
 
-    const { userId, getToken } = useAuth();
+    const { userId } = useAuth();
 
     const getTodo = async () => {
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await getSupabaseClient(accessToken);
-
         const { data, error } = await supabase
             .from('todos')
             .select('*')
@@ -46,9 +43,6 @@ const EditTodoModal = (props: EditTodoProps) => {
 
     const UpdatedTodo = async () => {
         const currentTime = new Date().getTime();
-        const accessToken = await getToken({ template: 'supabase' });
-        const supabase = await getSupabaseClient(accessToken);
-
         const { error } = await supabase
             .from('todos')
             .update({ text: input, updated_at: currentTime })
