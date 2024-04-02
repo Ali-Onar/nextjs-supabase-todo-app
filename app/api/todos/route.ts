@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         handleErrorResponse(error);
 
         return NextResponse.json(data, { status: 201 });
-    } catch (error: any) {
+    } catch (error) {
         const err = error as Error;
 
         handleJSErrorResponse(err.message);
@@ -66,7 +66,7 @@ export async function PUT(request: Request) {
         handleErrorResponse(error);
 
         return NextResponse.json(data, { status: 201 });
-    } catch (error: any) {
+    } catch (error) {
         const err = error as Error;
 
         handleJSErrorResponse(err.message);
@@ -89,7 +89,7 @@ export async function DELETE(request: Request) {
         handleErrorResponse(error);
 
         return NextResponse.json(data, { status: 201 });
-    } catch (error: any) {
+    } catch (error) {
         const err = error as Error;
 
         handleJSErrorResponse(err.message);
