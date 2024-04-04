@@ -9,6 +9,7 @@ import NewTodo from '@/components/dragAndDrop/CreateTodoModal';
 import { SortableContext } from '@dnd-kit/sortable';
 import { TodosType } from '@/utils/types/helper.types';
 import supabase from '@/utils/supabase/supabaseClient';
+import { reportLog, supabaseReportException } from '@/utils/sentry/reportExeptions';
 
 const cardTitles = [
     { index: 0, title: 'Unassigned' },
@@ -34,13 +35,14 @@ const Todos = () => {
     const sensors = useSensors(pointerSensor);
 
     const getTodos = async () => {
+        reportLog('Fetching todos', 'info');
         const { data, error } = await supabase
             .from('todos')
             .select('*')
             .order('updated_at', { ascending: false });
 
         if (error) {
-            console.log(error.message);
+            supabaseReportException(error);
 
             return;
         }
