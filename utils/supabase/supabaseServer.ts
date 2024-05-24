@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 
-import { auth } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 import { CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { Database } from '../types/database.types';
