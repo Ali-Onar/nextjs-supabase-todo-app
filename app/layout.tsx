@@ -1,3 +1,4 @@
+import { SupabaseProvider } from '@/hooks/SupabaseContext';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
@@ -24,15 +25,17 @@ export default function RootLayout({ children }: {
                     <link rel="icon" href="/favicon.ico" sizes="any" />
                 </head>
                 <body className={poppins.className}>
-                    <Toaster
-                        position="bottom-right"
-                        reverseOrder={false}
-                        toastOptions={{
-                            duration: 5000,
-                            style: { background: '#333', color: '#fff' },
-                        }}
-                    />
-                    {children}
+                    <SupabaseProvider>
+                        <Toaster
+                            position="bottom-right"
+                            reverseOrder={false}
+                            toastOptions={{
+                                duration: 5000,
+                                style: { background: '#333', color: '#fff' },
+                            }}
+                        />
+                        {children}
+                    </SupabaseProvider>
                 </body>
             </html>
         </ClerkProvider>
