@@ -2,7 +2,7 @@
 
 This project is a comprehensive demonstration of integrating Next.js with Supabase, Clerk, and Material UI to create a robust TODO application. It showcases CRUD operations, authentication, and a modern UI design.
 
-![Todo App View](<CleanShot 2023-12-23 at 18.45.52@2x.png>)
+![Todo App View](<todos-page-ss.png>)
 
 
 ## Overview
@@ -49,11 +49,7 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-The application should look like the following at the end:
-
-![Final project](<CleanShot 2023-12-23 at 18.00.01-1.gif>)
+Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
 
 ## Learn More
 
