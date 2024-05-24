@@ -8,7 +8,7 @@ import { useAuth } from '@clerk/nextjs';
 import NewTodo from '@/components/dragAndDrop/CreateTodoModal';
 import { SortableContext } from '@dnd-kit/sortable';
 import { TodosType } from '@/utils/types/helper.types';
-import supabase from '@/utils/supabase/supabaseClient';
+import useSupabase from '@/hooks/SupabaseContext';
 
 const cardTitles = [
     { index: 0, title: 'Unassigned' },
@@ -20,7 +20,7 @@ const Todos = () => {
     const [todos, setTodos] = useState<TodosType[]>([]);
     const [open, setOpen] = React.useState(false);
 
-    const container = typeof window !== 'undefined' ? window.Clerk : null;
+    const supabase = useSupabase();
 
     const { userId } = useAuth();
 
@@ -34,6 +34,8 @@ const Todos = () => {
     const sensors = useSensors(pointerSensor);
 
     const getTodos = async () => {
+        if (!supabase) return;
+
         const { data, error } = await supabase
             .from('todos')
             .select('*')
@@ -50,7 +52,7 @@ const Todos = () => {
 
     useEffect(() => {
         getTodos();
-    }, [container]);
+    }, [supabase]);
 
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;

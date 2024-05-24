@@ -3,7 +3,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, I
 import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
-import supabase from '@/utils/supabase/supabaseClient';
+import useSupabase from '@/hooks/SupabaseContext';
 
 type EditTodoProps = {
     open: boolean;
@@ -20,6 +20,7 @@ const EditTodoModal = (props: EditTodoProps) => {
     const [input, setInput] = useState<string>('');
 
     const { userId } = useAuth();
+    const supabase = useSupabase();
 
     const getTodo = async () => {
         const { data, error } = await supabase

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, Typography, Chip, Divider, IconButton, Box } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { CSS } from '@dnd-kit/utilities';
@@ -10,7 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { TodosType } from '@/utils/types/helper.types';
 import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
-import supabase from '@/utils/supabase/supabaseClient';
+import useSupabase from '@/hooks/SupabaseContext';
 import EditTodoModal from './EditTodoModal';
 
 type TodoItemProps = {
@@ -20,8 +20,11 @@ type TodoItemProps = {
 
 const TodoItem = (props: TodoItemProps) => {
     const { todo, refreshTodos } = props;
-    const [editTodoShow, setEditTodoShow] = React.useState<boolean>(false);
+
+    const [editTodoShow, setEditTodoShow] = useState<boolean>(false);
+
     const { userId } = useAuth();
+    const supabase = useSupabase();
 
     const {
         attributes,

@@ -1,23 +1,44 @@
-'use server';
+/* eslint-disable import/prefer-default-export */
 
-import { createClient } from '@supabase/supabase-js';
 import { auth } from '@clerk/nextjs';
+import { CookieOptions, createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { Database } from '../types/database.types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-async function getSupabaseServer() {
-    const { userId, getToken } = auth();
-    if (!userId) throw new Error('User not authenticated');
+export async function createClerkSupabaseClient() {
+    const cookieStore = cookies();
+    const { getToken } = auth();
 
-    const accessToken = await getToken({ template: 'supabase' });
+    const token = await getToken({ template: 'supabase' });
+    const authToken = token ? { Authorization: `Bearer ${token}` } : null;
 
-    return createClient<Database>(
+    return createServerClient<Database>(
         supabaseUrl,
         supabaseAnonKey,
-        { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+        {
+            global: { headers: { 'Cache-Control': 'no-store', ...authToken } },
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+                set(name: string, value: string, options: CookieOptions) {
+                    try {
+                        cookieStore.set({ name, value, ...options });
+                    } catch (error) {
+                        // Handle the error
+                    }
+                },
+                remove(name: string, options: CookieOptions) {
+                    try {
+                        cookieStore.set({ name, value: '', ...options });
+                    } catch (error) {
+                        // Handle the error
+                    }
+                },
+            },
+        },
     );
 }
-
-export default getSupabaseServer;

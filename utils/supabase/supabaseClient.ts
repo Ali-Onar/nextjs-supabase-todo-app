@@ -14,21 +14,18 @@ declare global {
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-function createClerkSupabaseClient() {
+function getSupabase() {
     return createClient<Database>(
         supabaseUrl,
         supabaseAnonKey,
         {
             global: {
-                // Get the Supabase token with a custom fetch method
                 fetch: async (url, options = {}) => {
                     const clerkToken = await window.Clerk.session?.getToken({ template: 'supabase' });
 
-                    // Construct fetch headers
                     const headers = new Headers(options?.headers);
                     headers.set('Authorization', `Bearer ${clerkToken}`);
 
-                    // Now call the default fetch
                     return fetch(url, {
                         ...options,
                         headers,
@@ -39,6 +36,6 @@ function createClerkSupabaseClient() {
     );
 }
 
-const supabase = createClerkSupabaseClient();
+const supabaseClient = getSupabase();
 
-export default supabase;
+export default supabaseClient;
