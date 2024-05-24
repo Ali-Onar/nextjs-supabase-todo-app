@@ -17,8 +17,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const pages = [
     { title: 'Home', href: '/' },
-    { title: 'D&D Todos', href: '/dnd-todos' },
-    { title: 'SSR Test', href: '/server-side-test' },
+    { title: 'Todos', href: '/todos' },
 ];
 
 function Header() {

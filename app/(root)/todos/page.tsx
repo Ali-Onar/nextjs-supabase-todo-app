@@ -16,7 +16,7 @@ const cardTitles = [
     { index: 2, title: 'In Progress' },
     { index: 3, title: 'Done' }];
 
-const Todos = () => {
+const TodosPage = () => {
     const [todos, setTodos] = useState<TodosType[]>([]);
     const [open, setOpen] = React.useState(false);
 
@@ -90,7 +90,7 @@ const Todos = () => {
         <>
             <Container maxWidth="xl">
                 <Grid container spacing={2} sx={{ mt: 5, display: 'flex', justifyContent: 'center' }}>
-                    <Grid item md={12}>
+                    <Grid item xs={12}>
                         <Button color="primary" onClick={() => { setOpen(true); }} variant="outlined">Create Todo</Button>
                     </Grid>
                     <DndContext sensors={sensors} onDragEnd={(event) => { handleDragEnd(event); }}>
@@ -114,4 +114,4 @@ const Todos = () => {
     );
 };
 
-export default Todos;
+export default TodosPage;
